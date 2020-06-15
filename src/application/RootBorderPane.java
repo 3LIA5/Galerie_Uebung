@@ -43,7 +43,7 @@ public class RootBorderPane extends BorderPane
 		
 		miSortierenKuestler = new MenuItem("aufsteigend nach Künstler");
 		miSortierenWert = new MenuItem("absteigend nach Wert");
-		miLoeschen = new MenuItem("Löschen");
+		miLoeschen = new MenuItem("Löschen ");
 		miAendern = new MenuItem("Ändern");
 		
 		miInfo = new MenuItem("Über");
