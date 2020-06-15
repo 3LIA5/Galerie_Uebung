@@ -1,8 +1,14 @@
 package application;
 
+import java.io.File;
+
 import javafx.application.Platform;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
+import model.Galerie;
+import model.GalerieException;
 
 public class RootBorderPane extends BorderPane
 {
@@ -12,11 +18,14 @@ public class RootBorderPane extends BorderPane
 	private MenuItem miLadenSerialisiert, miSpeichernSerialisiert, miImportCsv, miExportCsv, miImportFormatiert, miExportFormatiert, miBeenden,
 					 miSortierenKuestler, miSortierenWert, miLoeschen, miAendern, miHinzufuegenBild, miHinzufuegenSkulptur,
 					 miInfo;
+	private Galerie galerie;
 	
 	public RootBorderPane()
 	{
 		initMenues();
 		addMenues();
+		initComponents();
+//		addComponents();
 		disableCompenents(true);
 		addHandler();
 	}
@@ -70,11 +79,94 @@ public class RootBorderPane extends BorderPane
 		miLoeschen.setDisable(disable);
 		miAendern.setDisable(disable);
 	}
+	private void initComponents()
+	{
+		galerie = new Galerie("MyGalerie");
+	}
 	private void addHandler()
 	{
-		miBeenden.setOnAction(event -> beenden());
+		miBeenden				.setOnAction(event -> beenden());
+		miLadenSerialisiert		.setOnAction(event -> laden("ser"));
+		miImportFormatiert		.setOnAction(event -> laden("txt"));
+		miImportCsv				.setOnAction(event -> laden("csv"));
+		miSpeichernSerialisiert	.setOnAction(event -> speichern("ser"));
+		miExportCsv				.setOnAction(event -> speichern("csv"));
+		miExportFormatiert  	.setOnAction(event -> speichern("txt"));
 	}
 //	----------------------------- Handlermethoden --------------------------
+	private void laden(String format)
+	{
+		FileChooser filechooser = new FileChooser();
+		try
+		{
+			filechooser.setInitialDirectory(new File("C:\\scratch\\"));
+			File file = filechooser.showOpenDialog(null);
+			if (file!=null)
+			{
+				if(format.equals("ser"))
+					galerie.loadKunstwerke(file.getAbsolutePath());
+				else
+					if(format.equals("txt"))
+						galerie.importKunstwerke(file.getAbsolutePath());
+					else
+						Main.showAlert(AlertType.WARNING, "Das Format *."+format+" kann nicht geladen werden!");
+				disableCompenents(false);
+				System.out.println(galerie);
+			}
+			else
+				Main.showAlert(AlertType.ERROR, "Laden wurde abgebrochen");
+		} 
+		catch (GalerieException e)
+		{
+			Main.showAlert(AlertType.ERROR, e.getMessage());
+		}
+		catch (Exception e)
+		{
+			Main.showAlert(AlertType.ERROR, e.getMessage());
+		}
+
+	}
+	
+	private void speichern(String format)
+	{
+		FileChooser filechooser = new FileChooser();
+		try
+		{
+			filechooser.setInitialDirectory(new File("C:\\scratch\\"));
+//			filechooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SER files (*.ser)","*.ser"),
+//													 new FileChooser.ExtensionFilter("TXT files (*.txt)","*.txt"),
+//													 new FileChooser.ExtensionFilter("CSV files (*.csv)","*.csv"));
+			File file = filechooser.showSaveDialog(null);
+			if (file!=null)
+			{
+				if(format.equals("ser"))
+					galerie.saveKunstwerke(file.getAbsolutePath());
+				else
+					if(format.equals("csv"))
+						galerie.exportKunstwerkeCsv(file.getAbsolutePath());
+					else
+						if(format.equals("txt"))
+							galerie.exportKunstwerkeFormat(file.getAbsolutePath());
+						else
+							Main.showAlert(AlertType.INFORMATION, "Unbekanntes File-Format gewählt!");
+				
+				Main.showAlert(AlertType.INFORMATION, "Datei auf "+file.getAbsoluteFile()+" gespeichert!");
+			}
+			else
+				Main.showAlert(AlertType.WARNING, "Keine Datei ausgewählt!");
+		} 
+		catch (GalerieException e)
+		{
+			Main.showAlert(AlertType.ERROR, e.getMessage());
+		}
+		catch (Exception e)
+		{
+			Main.showAlert(AlertType.ERROR, e.getMessage());
+		}
+
+	}
+	
+	
 	private void beenden()
 	{
 		Platform.exit();

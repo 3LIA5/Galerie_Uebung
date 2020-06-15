@@ -47,6 +47,7 @@ public class TestSave
 			String filename = "C:\\scratch\\Kunstwerke.ser";
 			g.saveKunstwerke(filename);
 			System.out.println(".........gesaved  nach " + filename);
+//			System.out.println(g);
 		}
 		catch (GalerieException ge)
 		{
