@@ -18,14 +18,16 @@ public class RootBorderPane extends BorderPane
 	private MenuItem miLadenSerialisiert, miSpeichernSerialisiert, miImportCsv, miExportCsv, miImportFormatiert, miExportFormatiert, miBeenden,
 					 miSortierenKuestler, miSortierenWert, miLoeschen, miAendern, miHinzufuegenBild, miHinzufuegenSkulptur,
 					 miInfo;
+	
 	private Galerie galerie;
+	private KunstwerkeUebersicht uebersichtKunstwerke;
 	
 	public RootBorderPane()
 	{
 		initMenues();
 		addMenues();
 		initComponents();
-//		addComponents();
+		addComponents();
 		disableCompenents(true);
 		addHandler();
 	}
@@ -70,7 +72,6 @@ public class RootBorderPane extends BorderPane
 		mHilfe.getItems().add(miInfo);
 		
 		menuBar = new MenuBar(mDatei, mBearbeiten, mHilfe);		
-		setTop(menuBar);
 	}
 	private void disableCompenents(boolean disable)
 	{
@@ -82,6 +83,12 @@ public class RootBorderPane extends BorderPane
 	private void initComponents()
 	{
 		galerie = new Galerie("MyGalerie");
+		uebersichtKunstwerke = new KunstwerkeUebersicht();
+	}
+	private void addComponents()
+	{
+		setTop(menuBar);
+		setCenter(uebersichtKunstwerke);
 	}
 	private void addHandler()
 	{
@@ -92,6 +99,7 @@ public class RootBorderPane extends BorderPane
 		miSpeichernSerialisiert	.setOnAction(event -> speichern("ser"));
 		miExportCsv				.setOnAction(event -> speichern("csv"));
 		miExportFormatiert  	.setOnAction(event -> speichern("txt"));
+		
 	}
 //	----------------------------- Handlermethoden --------------------------
 	private void laden(String format)
@@ -111,6 +119,7 @@ public class RootBorderPane extends BorderPane
 					else
 						Main.showAlert(AlertType.WARNING, "Das Format *."+format+" kann nicht geladen werden!");
 				disableCompenents(false);
+				uebersichtKunstwerke.update(galerie.getKunstwerke());
 				System.out.println(galerie);
 			}
 			else
