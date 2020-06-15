@@ -12,6 +12,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
+import model.Bild;
 import model.Galerie;
 import model.GalerieException;
 import model.Kunstwerk;
@@ -27,6 +28,7 @@ public class RootBorderPane extends BorderPane
 	
 	private Galerie galerie;
 	private KunstwerkeUebersicht uebersichtKunstwerke;
+	private DialogKunstwerk dialog;
 	
 	private FlowPane fpBottom;
 	private Button btSortKuenstler, btSortWert, btUebersichtBeenden;
@@ -40,6 +42,7 @@ public class RootBorderPane extends BorderPane
 		disableCompenents(true);
 		setComponentsVisible(false);
 		addHandler();
+//		dialog.updateShowAndWait(new Bild());
 	}
 	private void initMenues()
 	{
@@ -87,7 +90,8 @@ public class RootBorderPane extends BorderPane
 	private void initComponents()
 	{
 		galerie 				= new Galerie("MyGalerie");
-		uebersichtKunstwerke 	= new KunstwerkeUebersicht();
+		uebersichtKunstwerke 	= new KunstwerkeUebersicht(this);
+		dialog 					= new DialogKunstwerk();
 		
 		fpBottom  				= new FlowPane();
 			fpBottom.setPadding(new Insets(8));
@@ -133,8 +137,7 @@ public class RootBorderPane extends BorderPane
 		btSortKuenstler			.setOnAction(event -> sort("Künstler"));
 		btUebersichtBeenden		.setOnAction(event -> ubersichtBeenden());
 		miLoeschen				.setOnAction(event -> loeschen());
-		
-		
+		miAendern				.setOnAction(event -> aendern());		
 	}
 //	----------------------------- Handlermethoden --------------------------
 	private void laden(String format)
@@ -246,6 +249,25 @@ public class RootBorderPane extends BorderPane
 		galerie = new Galerie("My Galerie");
 		disableCompenents(true);
 		setComponentsVisible(false);
+	}
+	public void aendern()
+	{
+		List<Kunstwerk> auswahl = uebersichtKunstwerke.getSelectionModel().getSelectedItems();
+		if(auswahl.size()>1)
+			if(auswahl.size()<1)
+				if(auswahl.get(0) instanceof Bild)
+				{
+					dialog.updateShowAndWait(auswahl.get(0));
+					if(!dialog.isUebernehmen())
+						Main.showAlert(AlertType.WARNING, "Bearbeitung durch Benutzer abgebrochen!");
+					uebersichtKunstwerke.update(galerie.getKunstwerke());
+				}					
+				else
+					Main.showAlert(AlertType.ERROR, "Ändern von 'Skulpturen' noch nicht implementiert!!");
+			else
+				Main.showAlert(AlertType.ERROR, "Bitte genau ein Kunstwerk zur bearbeitung auswählen!");
+		else
+			Main.showAlert(AlertType.ERROR, "Kein Kunstwerk ausgewählt");
 	}
 	private void beenden()
 	{
