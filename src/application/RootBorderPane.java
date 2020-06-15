@@ -1,6 +1,8 @@
 package application;
 
 import java.io.File;
+import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -12,6 +14,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
 import model.Galerie;
 import model.GalerieException;
+import model.Kunstwerk;
 
 public class RootBorderPane extends BorderPane
 {
@@ -129,6 +132,7 @@ public class RootBorderPane extends BorderPane
 		btSortWert				.setOnAction(event -> sort("Wert"));
 		btSortKuenstler			.setOnAction(event -> sort("Künstler"));
 		btUebersichtBeenden		.setOnAction(event -> ubersichtBeenden());
+		miLoeschen				.setOnAction(event -> loeschen());
 		
 		
 	}
@@ -219,6 +223,23 @@ public class RootBorderPane extends BorderPane
 
 			Main.showAlert(AlertType.ERROR, e.getMessage());
 		}
+	}
+	
+	public void loeschen()
+	{
+		List<Kunstwerk> auswahl = uebersichtKunstwerke.getSelectionModel().getSelectedItems();
+		if(auswahl.size()>0) 
+		{
+			Optional<ButtonType> result = Main.showAlert(AlertType.CONFIRMATION, "Wollen Sie die markierten Kunstwerke wirklich löschen");
+			if(result.get() == ButtonType.OK)
+			{
+				galerie.removeKunstwerke(auswahl);
+				uebersichtKunstwerke.update(galerie.getKunstwerke());
+			}
+//			if(result.get() == ButtonType.CANCEL) System.out.println("CANCEL");
+		}
+		else
+			Main.showAlert(AlertType.ERROR, "Kein Kunstwerk ausgewählt!");
 	}
 	private void ubersichtBeenden()
 	{

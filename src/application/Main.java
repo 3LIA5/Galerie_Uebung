@@ -1,5 +1,7 @@
 package application;
 
+import java.util.Optional;
+
 import javafx.application.*;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -24,12 +26,12 @@ public class Main extends Application
 			Platform.exit();
 		}
 	}
-	public static void showAlert(AlertType alertType, String message) // boolean RW, damit selbe Methode auch für Rückfragen verwendet werden kann
+	public static Optional<ButtonType> showAlert(AlertType alertType, String message) // boolean RW, damit selbe Methode auch für Rückfragen verwendet werden kann
 	{
 		Alert alert = new Alert(alertType, message);//, ButtonType.OK);
 		alert.setHeaderText(null);
 		alert.setTitle("Achtung!");
-		alert.showAndWait();
+		return alert.showAndWait();
 	}
 
 	//-----------------------------------------------------------------------
