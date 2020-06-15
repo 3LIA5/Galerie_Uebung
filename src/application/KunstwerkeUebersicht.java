@@ -13,7 +13,7 @@ public class KunstwerkeUebersicht extends ListView<Kunstwerk>
 	}
 	public void update(List<Kunstwerk> kunstwerke)
 	{
-		this.getItems().addAll(kunstwerke);
+		this.getItems().setAll(kunstwerke);
 	}
 
 

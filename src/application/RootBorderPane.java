@@ -3,9 +3,12 @@ package application;
 import java.io.File;
 
 import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
 import model.Galerie;
 import model.GalerieException;
@@ -22,6 +25,9 @@ public class RootBorderPane extends BorderPane
 	private Galerie galerie;
 	private KunstwerkeUebersicht uebersichtKunstwerke;
 	
+	private FlowPane fpBottom;
+	private Button btSortKuenstler, btSortWert, btUebersichtBeenden;
+	
 	public RootBorderPane()
 	{
 		initMenues();
@@ -29,6 +35,7 @@ public class RootBorderPane extends BorderPane
 		initComponents();
 		addComponents();
 		disableCompenents(true);
+		setComponentsVisible(false);
 		addHandler();
 	}
 	private void initMenues()
@@ -73,6 +80,29 @@ public class RootBorderPane extends BorderPane
 		
 		menuBar = new MenuBar(mDatei, mBearbeiten, mHilfe);		
 	}
+
+	private void initComponents()
+	{
+		galerie 				= new Galerie("MyGalerie");
+		uebersichtKunstwerke 	= new KunstwerkeUebersicht();
+		
+		fpBottom  				= new FlowPane();
+			fpBottom.setPadding(new Insets(8));
+			fpBottom.setAlignment(Pos.CENTER);
+			fpBottom.setHgap(8);
+			btSortKuenstler	 	= new Button("Sortieren nach Künstler");
+			btSortWert 			= new Button("Sortieren nach Wert");			
+			btUebersichtBeenden = new Button("Übersicht beenden");
+				FlowPane.setMargin(btUebersichtBeenden, new Insets(0,0,0,20));
+	}
+	private void addComponents()
+	{
+		setTop(menuBar);
+		setCenter(uebersichtKunstwerke);
+		setBottom(fpBottom);
+		
+		fpBottom.getChildren().addAll(btSortKuenstler, btSortWert, btUebersichtBeenden);
+	}
 	private void disableCompenents(boolean disable)
 	{
 		mSpeichern.setDisable(disable);
@@ -80,15 +110,10 @@ public class RootBorderPane extends BorderPane
 		miLoeschen.setDisable(disable);
 		miAendern.setDisable(disable);
 	}
-	private void initComponents()
+	private void setComponentsVisible(boolean visible)
 	{
-		galerie = new Galerie("MyGalerie");
-		uebersichtKunstwerke = new KunstwerkeUebersicht();
-	}
-	private void addComponents()
-	{
-		setTop(menuBar);
-		setCenter(uebersichtKunstwerke);
+		uebersichtKunstwerke.setVisible(visible);
+		fpBottom.setVisible(visible);
 	}
 	private void addHandler()
 	{
@@ -99,6 +124,12 @@ public class RootBorderPane extends BorderPane
 		miSpeichernSerialisiert	.setOnAction(event -> speichern("ser"));
 		miExportCsv				.setOnAction(event -> speichern("csv"));
 		miExportFormatiert  	.setOnAction(event -> speichern("txt"));
+		miSortierenKuestler		.setOnAction(event -> sort("Künstler"));
+		miSortierenWert			.setOnAction(event -> sort("Wert"));
+		btSortWert				.setOnAction(event -> sort("Wert"));
+		btSortKuenstler			.setOnAction(event -> sort("Künstler"));
+		btUebersichtBeenden		.setOnAction(event -> ubersichtBeenden());
+		
 		
 	}
 //	----------------------------- Handlermethoden --------------------------
@@ -119,6 +150,7 @@ public class RootBorderPane extends BorderPane
 					else
 						Main.showAlert(AlertType.WARNING, "Das Format *."+format+" kann nicht geladen werden!");
 				disableCompenents(false);
+				setComponentsVisible(true);
 				uebersichtKunstwerke.update(galerie.getKunstwerke());
 				System.out.println(galerie);
 			}
@@ -175,7 +207,25 @@ public class RootBorderPane extends BorderPane
 
 	}
 	
-	
+	private void sort(String str)
+	{
+		try
+		{
+			galerie.sort(str);
+			uebersichtKunstwerke.update(galerie.getKunstwerke());
+		} 
+		catch (GalerieException e)
+		{
+
+			Main.showAlert(AlertType.ERROR, e.getMessage());
+		}
+	}
+	private void ubersichtBeenden()
+	{
+		galerie = new Galerie("My Galerie");
+		disableCompenents(true);
+		setComponentsVisible(false);
+	}
 	private void beenden()
 	{
 		Platform.exit();
