@@ -1,5 +1,6 @@
 package application;
 
+import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
@@ -17,6 +18,7 @@ public class RootBorderPane extends BorderPane
 		initMenues();
 		addMenues();
 		disableCompenents(true);
+		addHandler();
 	}
 	private void initMenues()
 	{
@@ -67,5 +69,14 @@ public class RootBorderPane extends BorderPane
 		mSortieren.setDisable(disable);
 		miLoeschen.setDisable(disable);
 		miAendern.setDisable(disable);
+	}
+	private void addHandler()
+	{
+		miBeenden.setOnAction(event -> beenden());
+	}
+//	----------------------------- Handlermethoden --------------------------
+	private void beenden()
+	{
+		Platform.exit();
 	}
 }
